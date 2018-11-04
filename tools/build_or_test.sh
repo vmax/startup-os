@@ -9,6 +9,12 @@
 RED=$(tput setaf 1)
 RESET=$(tput sgr0)
 
+export HOME=/home/circleci/
+
+sudo chmod -R a+rwx /home/
+
+env
+
 # Warn if ANDROID_HOME is not set.
 if [[ -z "$ANDROID_HOME" ]]; then
   echo "$RED""ANDROID_HOME not set, skipping Android targets. See examples/android for more details.$RESET"

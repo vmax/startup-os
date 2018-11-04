@@ -7,31 +7,30 @@ RED=$(tput setaf 1)
 GREEN=$(tput setaf 2)
 RESET=$(tput sgr0)
 
-git diff --name-only origin/master | grep --quiet dependencies.yaml
-if [ $? -eq 0 ]
-then
-  echo "$RED[!] ""dependencies.yaml was modified, running the check$RESET"
-else
-  echo "$GREEN[!] ""dependencies.yaml was not modified, exiting (code $?) $RESET"
-  exit 0
-fi
+
+export HOME=/home/circleci/
+sudo chmod -R a+rwx .
+git config --global user.email "cloudbuild@google.com"
+git config --global user.name "Google Cloudbuild Service"
+
+git init .
+git add -A && git commit -a -m "initial"
 
 # Regenerate dependencies
 bazel run //tools:bazel_deps -- generate \
   -r $(pwd) \
   -s third_party/maven/package-lock.bzl \
-  -d dependencies.yaml \
-  &>/dev/null
+  -d dependencies.yaml
 
 # Format generated BUILD files
 bazel run //tools/formatter -- \
   --path $(pwd)/third_party/maven/ \
-  --build \
-  &>/dev/null
+  --build
 
 # Print error if on CircleCI and dependencies were not up-to-date
-if [[ ! -z "$CIRCLECI" && ! -z $(git status -s) ]]; then
+if [[ ! -z $(git status -s) ]]; then
   echo "$RED[!] Dependency tree does not match dependencies.yaml$RESET"
   echo "Please run ''$0'' to fix it"
+  git status -v
   exit 1
 fi

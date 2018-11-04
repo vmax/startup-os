@@ -4,7 +4,7 @@ RED=$(tput setaf 1)
 RESET=$(tput sgr0)
 
 if [ -z "$ANDROID_HOME" ]; then
-	export ANDROID_HOME=$HOME/android_sdk/
+	export ANDROID_HOME=/android_sdk/
 fi
 
 DOWNLOAD_COMMAND=wget
@@ -32,7 +32,7 @@ else
 fi
 
 
-if [ ! -d "$ANDROID_HOME" ]; then
+if [[ ! -d "$ANDROID_HOME"  || $1 == "--force" ]]; then
 	$DOWNLOAD_COMMAND $URL_BASE/$FILENAME
 	unzip $FILENAME -d $ANDROID_HOME
 	(yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses) || true

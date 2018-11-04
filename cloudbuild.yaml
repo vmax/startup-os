@@ -1,0 +1,51 @@
+steps:
+#- name: 'gcr.io/cloud-builders/docker'
+#  args: ['pull', 'gcr.io/$PROJECT_ID/buildrunner:latest']
+- name: 'gcr.io/cloud-builders/docker'
+  args: [
+    'build',
+    '-f', 'Dockerfile.prereqs',
+    '-t', 'gcr.io/$PROJECT_ID/buildrunner:latest',
+    '--cache-from', 'gcr.io/$PROJECT_ID/buildrunner:latest',
+    '.'
+  ]
+- name: 'gcr.io/$PROJECT_ID/buildrunner:latest'
+  args: ['./asd.sh']
+  volumes:
+  - name: 'homevol'
+    path: '/home'
+- name: gcr.io/cloud-builders/gsutil
+  args: ['cp', '-r', 'gs://$PROJECT_ID/bazel-cache', '/home/circleci/']
+  volumes:
+  - name: 'homevol'
+    path: '/home'
+#- name: 'gcr.io/$PROJECT_ID/buildrunner:latest'
+#  args: ['tools/deps/check_dependencies.sh']
+#- name: 'gcr.io/$PROJECT_ID/buildrunner:latest'
+#  args: ['tools/fix_formatting.sh']
+- name: 'gcr.io/$PROJECT_ID/buildrunner:latest'
+  args: ['./build.sh']
+  env:
+  - "ANDROID_HOME=/android_sdk/"
+  volumes:
+  - name: 'homevol'
+    path: '/home'
+- name: 'gcr.io/$PROJECT_ID/buildrunner:latest'
+  args: ['./test.sh']
+  env:
+  - "ANDROID_HOME=/android_sdk/"
+  volumes:
+  - name: 'homevol'
+    path: '/home'
+- name: 'gcr.io/$PROJECT_ID/buildrunner:latest'
+  args: ['./asd.sh']
+  volumes:
+  - name: 'homevol'
+    path: '/home'
+- name: gcr.io/cloud-builders/gsutil
+  args: ['cp', '-r', '/home/circleci/', 'gs://$PROJECT_ID/bazel-cache']
+  volumes:
+  - name: 'homevol'
+    path: '/home'
+images: ['gcr.io/$PROJECT_ID/buildrunner:latest']
+timeout: "20m"
