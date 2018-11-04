@@ -11,9 +11,11 @@ RESET=$(tput sgr0)
 
 export HOME=/home/circleci/
 
-sudo chmod -R a+rwx /home/
+set -x
 
-env
+sudo chmod -R a+rwx /home/
+sudo chmod -R a+rwx /workspace/
+
 
 # Warn if ANDROID_HOME is not set.
 if [[ -z "$ANDROID_HOME" ]]; then

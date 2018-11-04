@@ -33,11 +33,11 @@ fi
 
 
 if [[ ! -d "$ANDROID_HOME"  || $1 == "--force" ]]; then
-	$DOWNLOAD_COMMAND $URL_BASE/$FILENAME
-	unzip $FILENAME -d $ANDROID_HOME
-	(yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses) || true
-	$ANDROID_HOME/tools/bin/sdkmanager "platforms;android-27" "build-tools;27.0.3"
-	echo "Removing $(rm -v $FILENAME)"
+	$DOWNLOAD_COMMAND $URL_BASE/$FILENAME &>/dev/null
+	unzip $FILENAME -d $ANDROID_HOME &>/dev/null
+	(yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses) || true &>/dev/null
+	$ANDROID_HOME/tools/bin/sdkmanager "platforms;android-27" "build-tools;27.0.3" &>/dev/null
+	echo "Removing $(rm -v $FILENAME)" &>/dev/null
 fi
 
 
